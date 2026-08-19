@@ -726,12 +726,15 @@ $$;
 -- null quando não há histórico.
 create or replace function fn_dashboard_summary(p_company uuid)
 returns table (
-  saldo_atual_cents     bigint,
-  a_receber_cents       bigint,   -- "quanto falta receber"
-  a_pagar_cents         bigint,   -- "quanto falta pagar"
+  saldo_atual_cents     bigint,   -- "saldo na conta" (todas as contas ativas)
+  receitas_mes_cents    bigint,   -- o que entrou pago no mês corrente
+  despesas_mes_cents    bigint,   -- o que saiu pago no mês corrente
+  resultado_dia_cents   bigint,   -- "saldo do dia": entrou − saiu pago HOJE
+  a_receber_cents       bigint,
+  a_pagar_cents         bigint,
   vencido_receber_cents bigint,
   vencido_pagar_cents   bigint,
-  resultado_mes_cents   bigint,   -- "quanto sobrou no mês" (caixa)
+  resultado_mes_cents   bigint,
   runway_meses          numeric
 )
 language sql stable
@@ -741,6 +744,19 @@ as $$
     from v_account_balances
     where company_id = p_company and archived_at is null
   ),
+  mes as (
+    select
+      coalesce(sum(amount_cents) filter (where kind = 'receita'), 0) as rec,
+      coalesce(sum(amount_cents) filter (where kind = 'despesa'), 0) as desp
+    from entries
+    where company_id = p_company and status = 'pago'
+      and paid_date >= date_trunc('month', brt_today())::date
+  ),
+  dia as (
+    select coalesce(sum(case when kind = 'receita' then amount_cents else -amount_cents end), 0) as r
+    from entries
+    where company_id = p_company and status = 'pago' and paid_date = brt_today()
+  ),
   abertos as (
     select
       coalesce(sum(amount_cents) filter (where kind = 'receita'), 0) as rec,
@@ -749,12 +765,6 @@ as $$
       coalesce(sum(amount_cents) filter (where kind = 'despesa' and due_date < brt_today()), 0) as pag_venc
     from entries
     where company_id = p_company and status = 'previsto'
-  ),
-  mes as (
-    select coalesce(sum(case when kind = 'receita' then amount_cents else -amount_cents end), 0) as r
-    from entries
-    where company_id = p_company and status = 'pago'
-      and paid_date >= date_trunc('month', brt_today())::date
   ),
   burn as (
     select avg(m.total) as a
@@ -768,9 +778,11 @@ as $$
     ) m
   )
   select
-    saldo.s, abertos.rec, abertos.pag, abertos.rec_venc, abertos.pag_venc, mes.r,
+    saldo.s, mes.rec, mes.desp, dia.r,
+    abertos.rec, abertos.pag, abertos.rec_venc, abertos.pag_venc,
+    mes.rec - mes.desp,
     case when coalesce(burn.a, 0) > 0 then round(saldo.s / burn.a, 1) end
-  from saldo, abertos, mes, burn
+  from saldo, mes, dia, abertos, burn
 $$;
 
 -- Top despesas do período (caixa), por categoria-folha.

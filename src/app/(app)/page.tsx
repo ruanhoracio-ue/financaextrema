@@ -15,6 +15,9 @@ import { PageHeader } from '@/components/app/PageHeader'
 
 type Resumo = {
   saldo_atual_cents: number
+  receitas_mes_cents: number
+  despesas_mes_cents: number
+  resultado_dia_cents: number
   a_receber_cents: number
   a_pagar_cents: number
   vencido_receber_cents: number
@@ -110,10 +113,10 @@ export default function DashboardPage() {
 
       {visiveis.has('metrics') && (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <MetricCard label="Saldo em contas" value={money(r?.saldo_atual_cents)} />
-          <MetricCard label="Falta receber" value={money(r?.a_receber_cents)} />
-          <MetricCard label="Falta pagar" value={money(r?.a_pagar_cents)} />
-          <MetricCard label="Sobrou no mês" value={money(r?.resultado_mes_cents)} />
+          <MetricCard label="Saldo na conta" value={money(r?.saldo_atual_cents)} />
+          <MetricCard label="Receitas" value={money(r?.receitas_mes_cents)} />
+          <MetricCard label="Despesas" value={money(r?.despesas_mes_cents)} />
+          <MetricCard label="Saldo do dia" value={money(r?.resultado_dia_cents)} />
         </div>
       )}
 
