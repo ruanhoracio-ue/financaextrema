@@ -1,0 +1,33 @@
+{
+  "name": "financas-extremas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Template de gestão financeira para pequenas empresas de serviço — Next.js + Supabase + Design System Conversão Extrema.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "deploy": "next build && wrangler deploy",
+    "preview": "next build && wrangler dev"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.58.0",
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "supabase": "^2.45.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^4.124.0"
+  }
+}
