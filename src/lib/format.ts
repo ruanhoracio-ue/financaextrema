@@ -43,3 +43,18 @@ export function addDaysISO(iso: string, days: number): string {
 export function firstDayOfMonthISO(iso: string): string {
   return `${iso.slice(0, 7)}-01`
 }
+
+const brlCompact = new Intl.NumberFormat('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+
+/** "R$ 45 mil" — para eixos e rótulos de gráfico. */
+export function moneyCompact(cents: number): string {
+  return `R$ ${brlCompact.format(cents / 100)}`
+}
+
+/** Passo "redondo" de eixo: divide o teto em ~4 e arredonda para 1/2/2,5/5×10^n. */
+export function niceStep(max: number): number {
+  const bruto = max / 4
+  const mag = 10 ** Math.floor(Math.log10(Math.max(bruto, 1)))
+  for (const m of [1, 2, 2.5, 5, 10]) if (bruto <= m * mag) return m * mag
+  return 10 * mag
+}
