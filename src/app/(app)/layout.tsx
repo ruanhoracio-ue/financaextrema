@@ -33,6 +33,7 @@ const grupos = [
       {
         key: 'relatorios', label: 'Relatórios', icon: ChartBar,
         items: [
+          { key: '/relatorios/fechamento', label: 'Fechamento do mês' },
           { key: '/relatorios/dre', label: 'Resultado (DRE)' },
           { key: '/relatorios/centros-de-custo', label: 'Centros de custo' },
         ],
@@ -91,7 +92,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="ds-app flex min-h-dvh bg-canvas">
       {/* sidebar desktop */}
-      <aside className="sticky top-0 hidden h-dvh shrink-0 lg:block">{nav}</aside>
+      <aside className="sticky top-0 hidden h-dvh shrink-0 print:!hidden lg:block">{nav}</aside>
 
       {/* drawer mobile */}
       {drawer && (
@@ -102,7 +103,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-hairline bg-surface/80 px-4 py-3 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-hairline bg-surface/80 px-4 py-3 backdrop-blur print:hidden lg:px-8">
           <div className="flex items-center gap-3">
             <button
               className="rounded-full p-2 text-mute transition-colors hover:bg-ink/10 hover:text-ink lg:hidden"
